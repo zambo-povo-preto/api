@@ -1,0 +1,38 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "api-dev",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-03-27",
+  "account_id": "78c04ce106fa0ed7d0fa7e9fd1cd7c5f",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "vars": {
+    "DOMAIN": "localhost",
+    "ENVIRONMENT": "development",
+    "PANEL_BASE_URL": "http://localhost:3000",
+    "SITE_BASE_URL": "http://localhost:3001",
+    "S3_API_URL": "http://localhost:3333/attachments",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "zambo-db-dev",
+      "database_id": "4f674246-ce51-40e3-b022-8d504577284f",
+      "remote": false,
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2_BUCKET",
+      "bucket_name": "zambo-attachments-dev",
+      "remote": false,
+    },
+  ],
+  "dev": {
+    "ip": "localhost",
+    "port": 3333,
+    "local_protocol": "http",
+    "upstream_protocol": "http",
+  }
+}
