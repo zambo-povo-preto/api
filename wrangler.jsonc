@@ -5,7 +5,7 @@
 	"compatibility_date": "2026-03-27",
 	"account_id": "78c04ce106fa0ed7d0fa7e9fd1cd7c5f",
 	"compatibility_flags": ["nodejs_compat"],
-	"workers_dev": false,
+	"workers_dev": true,
 	"preview_urls": false,
 	"vars": {
 		"DOMAIN": "localhost",
