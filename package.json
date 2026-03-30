@@ -2,7 +2,7 @@
 	"name": "api",
 	"type": "module",
 	"scripts": {
-		"dev": "wrangler dev",
+		"dev": "wrangler dev --ip=0.0.0.0 --port=3333 --local-protocol=https --https-cert-path=./cert/cert.pem --https-key-path=./cert/key.pem src/index.ts",
 		"deploy": "wrangler deploy --minify",
 		"cf-typegen": "wrangler types --env-interface CloudflareBindings",
 		"lint": "npx @biomejs/biome format --write"
