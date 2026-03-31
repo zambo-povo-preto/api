@@ -1,5 +1,9 @@
 export class DatabaseError extends Error {
-  constructor() {
-    super('An error occurred while accessing the database.');
+  details?: unknown;
+
+  constructor(message: string, details?: unknown) {
+    super(message);
+    this.name = "DatabaseError";
+    this.details = details;
   }
 }
