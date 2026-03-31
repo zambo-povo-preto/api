@@ -1,0 +1,9 @@
+{
+  "error-email-already-exists": "Este email já está em uso.",
+  "error-max-length": "O campo deve conter no máximo {{max}} caracteres.",
+  "error-min-length": "O campo deve conter no mínimo {{min}} caracteres.",
+  "invalid-email": "Email inválido.",
+  "invalid-password": "A senha deve ter no mínimo 8 caracteres, incluindo uma letra maiúscula, uma letra minúscula, um número e um caractere especial.",
+  "required-field": "Este campo é obrigatório.",
+  "resource-not-found": "Recurso não encontrado."
+}
