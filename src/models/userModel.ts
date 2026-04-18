@@ -1,15 +1,30 @@
+import type { TranslatorFn } from '@/dictionaries';
 import { DatabaseError } from '@/errors/DatabaseError';
-import { UsersDAF } from '@/services/database/users-daf';
+import * as z from 'zod';
 
-export class D1UserDAF implements UsersDAF {
-  private d1: D1Database;
+export const userSchema = (t: TranslatorFn) => {
+  const userSchema = z.object({
+    name: z
+      .string()
+      .min(5, t('error-min-length', { min: 5 }))
+      .max(255, t('error-max-length', { max: 255 })),
+    email: z.email(t('invalid-email')).min(1, t('required-field')),
+    password: z
+      .string()
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        {
+          message: t('invalid-password'),
+        },
+      )
+      .min(1, t('required-field'))
+  });
 
-  constructor(d1: D1Database) {
-    this.d1 = d1;
-  }
+  return userSchema;
+};
 
-  async findByEmail(email: string) {
-    const user = await this.d1
+export const findByEmail = async (email: string, env: Bindings) => {
+    const user = await env.DB
       .prepare(
         'SELECT id, name, email, password_hash FROM users WHERE email = ?',
       )
@@ -33,7 +48,7 @@ export class D1UserDAF implements UsersDAF {
     };
   }
 
-  async create({
+export const create = async ({
     id,
     name,
     email,
@@ -43,8 +58,8 @@ export class D1UserDAF implements UsersDAF {
     name: string;
     email: string;
     passwordHash: string;
-  }) {
-    const user = await this.d1
+  }, env: Bindings) =>{
+    const user = await env.DB
       .prepare(`
         INSERT INTO users (id, name, email, password_hash) 
         VALUES (?, ?, ?, ?) 
@@ -71,4 +86,3 @@ export class D1UserDAF implements UsersDAF {
       passwordHash: user.password_hash,
     };
   }
-}

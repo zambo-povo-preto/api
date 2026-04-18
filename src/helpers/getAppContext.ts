@@ -3,7 +3,6 @@ export const getAppContext = (c: DomainContext) => {
     t: c.get('dictionary'),
     timezone: c.get('timezone'),
     timezoneOffset: c.get('timezoneOffset'),
-    daf: c.get('daf'),
     inputs: c.get('inputs'),
     user: c.get('user'),
     queries: c.req.query(),
