@@ -1,9 +1,15 @@
-export const getAppContext = (c: DomainContext) => {
+import { getDictionary } from "@/dictionaries";
+
+export const getAppContext = async (c: DomainContext) => {
+  const t = getDictionary()
+
+  const inputs = await c.req.json();
+
   return {
-    t: c.get('dictionary'),
+    t,
     timezone: c.get('timezone'),
     timezoneOffset: c.get('timezoneOffset'),
-    inputs: c.get('inputs'),
+    inputs,
     user: c.get('user'),
     queries: c.req.query(),
     params: c.req.param(),

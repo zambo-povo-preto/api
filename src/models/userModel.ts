@@ -1,5 +1,6 @@
 import type { TranslatorFn } from '@/dictionaries';
 import { DatabaseError } from '@/errors/DatabaseError';
+import {Client} from 'pg';
 import * as z from 'zod';
 
 export const userSchema = (t: TranslatorFn) => {
@@ -23,18 +24,22 @@ export const userSchema = (t: TranslatorFn) => {
   return userSchema;
 };
 
+
+
 export const findByEmail = async (email: string, env: Bindings) => {
-    const user = await env.DB
-      .prepare(
-        'SELECT id, name, email, password_hash FROM users WHERE email = ?',
-      )
-      .bind(email)
-      .first<{
-        id: string;
-        name: string;
-        email: string;
-        password_hash: string;
-      }>();
+    const client = new Client({
+      connectionString: env.DATABASE_URL,
+    })
+    await client.connect()
+
+    console.log('Finding user by email', email);
+
+     const res = await client.query(`
+      SELECT id, name, email, password_hash FROM users WHERE email = $1
+    `, [ email ])
+      await client.end()  
+
+    const user = res.rows[0];
 
     if (!user) {
       return null;
@@ -59,19 +64,19 @@ export const create = async ({
     email: string;
     passwordHash: string;
   }, env: Bindings) =>{
-    const user = await env.DB
-      .prepare(`
-        INSERT INTO users (id, name, email, password_hash) 
-        VALUES (?, ?, ?, ?) 
-        RETURNING id, name, email, password_hash`,
-      )
-      .bind(id, name, email, passwordHash)
-      .first<{
-        id: string;
-        name: string;
-        email: string;
-        password_hash: string;
-      }>();
+    const client = new Client({
+      connectionString: env.DATABASE_URL,
+    })
+      await client.connect()
+  
+    const res = await client.query(`
+      INSERT INTO users (id, name, email, password_hash)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, name, email, password_hash
+    `, [id, name, email, passwordHash])
+      await client.end()  
+
+    const user = res.rows[0];
 
     if (!user) {
       throw new DatabaseError('Failed to create user', {

@@ -3,6 +3,6 @@ import { Hono } from "hono";
 
 const app = new Hono()
 
-app.post("/register", registerController)
+app.post("/", registerController)
 
 export { app as userRouter }

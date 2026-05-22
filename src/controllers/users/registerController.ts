@@ -3,7 +3,7 @@ import { create, findByEmail, userSchema } from '@/models/userModel';
 import { hashPassword, ulid } from 'serverless-crypto-utils';
 
 export const registerController: ControllerFn = async (c) => {
-  const { t, inputs } = getAppContext(c);
+  const { t, inputs } = await getAppContext(c);
 
   const validationSchema = userSchema(t);
 

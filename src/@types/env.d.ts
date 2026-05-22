@@ -41,6 +41,7 @@ declare global {
 
     // Databases and Storages
     DB: D1Database;
+    DATABASE_URL: string;
     R2_BUCKET: R2Bucket;
   };
 }
