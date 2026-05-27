@@ -437,39 +437,42 @@ Usamos **dois tipos de tokens**:
 A biblioteca `serverless-crypto-utils` oferece funções para trabalhar com tokens:
 
 ```typescript
-import { generateToken, verifyToken, generateRefreshToken } from 'serverless-crypto-utils';
+import { createAccessToken } from 'serverless-crypto-utils';
 ```
 
 **Funções principais:**
 
 ```typescript
 // Gerar um novo token
-const token = await generateToken(
-  { id: "user-123", email: "joao@example.com" },  // Payload (dados do token)
-  env.ENCRYPTION_SECRET,                           // Secret (chave de criptografia)
-  "15m"                                             // Expira em 15 minutos
-);
+const token = await createAccessToken({
+  encryptionSecret: c.env.ENCRYPTION_SECRET, // variável de ambiente
+  signingSecret: c.env.SIGNING_SECRET, // variável de ambiente
+  payload: { // Payload (dados do token)
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
+  },
+  expiresInSeconds: 3600, // expira em 1 hora (3600 segundos)
+});
 
 // Gerar um refresh token
-const refreshToken = await generateRefreshToken(
-  { id: "user-123" },                              // Payload
-  env.ENCRYPTION_SECRET,
-  "7d"                                             // Expira em 7 dias
-);
-
-// Verificar se um token é válido
-const payload = await verifyToken(
-  token,
-  env.ENCRYPTION_SECRET
-);
-// payload = { id: "user-123", email: "joao@example.com", iat: ..., exp: ... }
+const refreshToken = await createAccessToken({
+  encryptionSecret: c.env.ENCRYPTION_SECRET, // variável de ambiente
+  signingSecret: c.env.SIGNING_SECRET, // variável de ambiente
+  payload: { // Payload (dados do token)
+    user: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    },
+  },
+  expiresInSeconds: 60 * 60 * 24 * 7, // expira em 7 dias
+});
 ```
-
-**Tempos de Expiração Comuns:**
-- `"15m"` = 15 minutos
-- `"1h"` = 1 hora
-- `"7d"` = 7 dias
-- `"30d"` = 30 dias
 
 ---
 
@@ -554,7 +557,7 @@ Vamos colocar tudo junto criando uma rota POST `/auth/login`.
 // src/controllers/auth/loginController.ts
 import { getAppContext } from '@/helpers/getAppContext';
 import { findByEmail } from '@/models/userModel';
-import { validatePassword, generateToken, generateRefreshToken } from 'serverless-crypto-utils';
+import { verifyPassword, createAccessToken } from 'serverless-crypto-utils';
 import * as z from 'zod';
 
 export const loginController: ControllerFn = async (c) => {
@@ -578,7 +581,7 @@ export const loginController: ControllerFn = async (c) => {
   }
   
   // 3. Validar senha
-  const passwordIsValid = await validatePassword(password, user.passwordHash);
+  const passwordIsValid = await verifyPassword(password, user.passwordHash);
   
   if (!passwordIsValid) {
     return c.json({ 
@@ -587,17 +590,33 @@ export const loginController: ControllerFn = async (c) => {
   }
   
   // 4. Gerar tokens
-  const accessToken = await generateToken(
-    { id: user.id, email: user.email },
-    c.env.ENCRYPTION_SECRET,
-    '15m'  // Token de acesso válido por 15 minutos
-  );
-  
-  const refreshToken = await generateRefreshToken(
-    { id: user.id },
-    c.env.ENCRYPTION_SECRET,
-    '7d'   // Refresh token válido por 7 dias
-  );
+  const token = await createAccessToken({
+    encryptionSecret: c.env.ENCRYPTION_SECRET, // variável de ambiente
+    signingSecret: c.env.SIGNING_SECRET, // variável de ambiente
+    payload: { // Payload (dados do token)
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    },
+    expiresInSeconds: 3600, // expira em 1 hora (3600 segundos)
+  });
+
+  const refreshToken = await createAccessToken({
+    encryptionSecret: c.env.ENCRYPTION_SECRET, // variável de ambiente
+    signingSecret: c.env.SIGNING_SECRET, // variável de ambiente
+    payload: { // Payload (dados do token)
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+    },
+    expiresInSeconds: 60 * 60 * 24 * 7, // expira em 7 dias
+  });
   
   // 5. Retornar sucesso com tokens
   return c.json({ 
@@ -621,7 +640,7 @@ Quando o `accessToken` expirar, o cliente envia o `refreshToken` para gerar um n
 // src/controllers/auth/refreshTokenController.ts
 import { getAppContext } from '@/helpers/getAppContext';
 import { findByEmail } from '@/models/userModel';
-import { verifyToken, generateToken } from 'serverless-crypto-utils';
+import { verifyAccessTokenSafe, createAccessToken } from 'serverless-crypto-utils';
 import * as z from 'zod';
 
 export const refreshTokenController: ControllerFn = async (c) => {
@@ -635,30 +654,34 @@ export const refreshTokenController: ControllerFn = async (c) => {
   const { refreshToken } = refreshSchema.parse(inputs);
   
   // 2. Verificar se o refreshToken é válido
-  let payload;
-  try {
-    payload = await verifyToken(refreshToken, c.env.ENCRYPTION_SECRET);
-  } catch (error) {
-    return c.json({ 
-      message: t('error-invalid-token') 
-    }, 401);
+  const result = await verifyAccessTokenSafe({
+    encryptionSecret: process.env.TOKEN_ENCRYPTION_SECRET,
+    signingSecret: process.env.TOKEN_SIGNING_SECRET,
+    accessToken: refreshToken, // O refreshToken é um accessToken com vida longa
+  });
+
+  if (!refreshResult.success) {
+    return c.json(
+      {
+        error: t('invalid-refresh-token-or-expired'),
+      },
+      401,
+    );
   }
-  
+
   // 3. Buscar usuário (para validar que ainda existe)
-  const user = await findById(payload.id, c.env);
-  
-  if (!user) {
-    return c.json({ 
-      message: t('error-user-not-found') 
-    }, 401);
-  }
+  const data = JSON.parse(refreshResult.data) as { user: User };
+  const user = data.user;
   
   // 4. Gerar novo accessToken
-  const newAccessToken = await generateToken(
-    { id: user.id, email: user.email },
-    c.env.ENCRYPTION_SECRET,
-    '15m'
-  );
+  const newAccessToken = await createAccessToken({
+    encryptionSecret: c.env.ENCRYPTION_SECRET,
+    signingSecret: c.env.SIGNING_SECRET,
+    payload: {
+      user,
+    },
+    expiresInSeconds: 3600, // 1 hour
+  });
   
   // 5. Retornar novo token
   return c.json({ 
@@ -764,7 +787,7 @@ Um middleware é uma função que **intercepta a requisição** e pode:
 
 ```typescript
 // src/middlewares/authMiddleware.ts
-import { verifyToken } from 'serverless-crypto-utils';
+import { verifyAccessTokenSafe } from 'serverless-crypto-utils';
 
 export const authMiddleware: MiddlewareFn = async (c, next) => {
   // 1. Obter o token do header Authorization
@@ -778,15 +801,19 @@ export const authMiddleware: MiddlewareFn = async (c, next) => {
   const token = authHeader.replace('Bearer ', '');
   
   // 3. Validar o token
-  let payload;
-  try {
-    payload = await verifyToken(token, c.env.ENCRYPTION_SECRET);
-  } catch (error) {
+  const result = await verifyAccessTokenSafe({
+    encryptionSecret: process.env.TOKEN_ENCRYPTION_SECRET,
+    signingSecret: process.env.TOKEN_SIGNING_SECRET,
+    accessToken: refreshToken, // O refreshToken é um accessToken com vida longa
+  });
+  
+  if (!result.success) {
     return c.json({ message: 'Token inválido ou expirado' }, 401);
   }
   
   // 4. Adicionar usuário ao contexto (para usar no controller)
-  c.set('user', payload);
+  const data = JSON.parse(refreshResult.data) as { user: User };
+  c.set('user', data.user);
   
   // 5. Chamar o próximo middleware/controller
   await next();
