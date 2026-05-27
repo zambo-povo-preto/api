@@ -669,11 +669,10 @@ export const refreshTokenController: ControllerFn = async (c) => {
     );
   }
 
-  // 3. Buscar usuário (para validar que ainda existe)
+  // 3. Gerar novo accessToken
   const data = JSON.parse(refreshResult.data) as { user: User };
   const user = data.user;
-  
-  // 4. Gerar novo accessToken
+
   const newAccessToken = await createAccessToken({
     encryptionSecret: c.env.ENCRYPTION_SECRET,
     signingSecret: c.env.SIGNING_SECRET,
@@ -683,7 +682,7 @@ export const refreshTokenController: ControllerFn = async (c) => {
     expiresInSeconds: 3600, // 1 hour
   });
   
-  // 5. Retornar novo token
+  // 4. Retornar novo token
   return c.json({ 
     message: 'Token renovado',
     accessToken: newAccessToken
