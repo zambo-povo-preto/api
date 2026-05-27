@@ -1,10 +1,10 @@
-import ptBR from './pt-BR.json';
+import ptBR from "./pt-BR.json";
 
 export type Lang = keyof typeof dictionaries;
 export type DictionaryKey = keyof typeof ptBR;
 
 export const dictionaries = {
-  'pt-BR': ptBR,
+  "pt-BR": ptBR,
 };
 
 export type TranslatorFn = (
@@ -14,8 +14,8 @@ export type TranslatorFn = (
   },
 ) => string;
 
-export const getDictionary = (lang = 'pt-BR') => {
-  let validLang: Lang = 'pt-BR';
+export const getDictionary = (lang = "pt-BR") => {
+  let validLang: Lang = "pt-BR";
   if (Object.keys(dictionaries).includes(lang)) {
     validLang = lang as Lang;
   }

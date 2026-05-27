@@ -1,6 +1,6 @@
-import { getAppContext } from '@/helpers/getAppContext';
-import { create, findByEmail, userSchema } from '@/models/userModel';
-import { hashPassword, ulid } from 'serverless-crypto-utils';
+import { getAppContext } from "@/helpers/getAppContext";
+import { create, findByEmail, userSchema } from "@/models/userModel";
+import { hashPassword, ulid } from "serverless-crypto-utils";
 
 export const registerController: ControllerFn = async (c) => {
   const { t, inputs } = await getAppContext(c);
@@ -12,17 +12,20 @@ export const registerController: ControllerFn = async (c) => {
   const userWithSameEmail = await findByEmail(email, c.env);
 
   if (userWithSameEmail) {
-    return c.json({ message: t('error-email-already-exists') }, 409);
+    return c.json({ message: t("error-email-already-exists") }, 409);
   }
 
   const passwordHash = await hashPassword(password);
 
-  const user = await create({
-    id: ulid(),
-    name,
-    email,
-    passwordHash,
-  }, c.env);
+  const user = await create(
+    {
+      id: ulid(),
+      name,
+      email,
+      passwordHash,
+    },
+    c.env,
+  );
 
   return c.json({ user }, 201);
 };

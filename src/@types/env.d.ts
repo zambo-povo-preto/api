@@ -1,6 +1,6 @@
-import type { Context, TypedResponse, Next } from 'hono';
-import type { TranslatorFn } from '@/dictionaries';
-import type { IDAF } from '@/services/database';
+import type { Context, TypedResponse, Next } from "hono";
+import type { TranslatorFn } from "@/dictionaries";
+import type { IDAF } from "@/services/database";
 
 declare global {
   type Env = { Bindings: Bindings; Variables: Variables };
@@ -26,7 +26,7 @@ declare global {
   };
 
   type Bindings = {
-    ENVIRONMENT: 'development' | 'production';
+    ENVIRONMENT: "development" | "production";
     ENCRYPTION_SECRET: string;
     SIGNING_SECRET: string;
 
