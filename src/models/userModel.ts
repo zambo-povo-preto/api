@@ -1,6 +1,5 @@
 import type { TranslatorFn } from "@/dictionaries";
 import { DatabaseError } from "@/errors/DatabaseError";
-import { Client } from "pg";
 import * as z from "zod";
 
 export const userSchema = (t: TranslatorFn) => {
@@ -13,7 +12,7 @@ export const userSchema = (t: TranslatorFn) => {
     password: z
       .string()
       .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, 
         {
           message: t("invalid-password"),
         },
@@ -25,22 +24,15 @@ export const userSchema = (t: TranslatorFn) => {
 };
 
 export const findByEmail = async (email: string, env: Bindings) => {
-  const client = new Client({
-    connectionString: env.DATABASE_URL,
-  });
-  await client.connect();
+  const res = await env.DB.prepare(`
+      SELECT id, name, email, password_hash
+      FROM users
+      WHERE email = ?
+    `)
+    .bind(email)
+    .all();
 
-  console.log("Finding user by email", email);
-
-  const res = await client.query(
-    `
-      SELECT id, name, email, password_hash FROM users WHERE email = $1
-    `,
-    [email],
-  );
-  await client.end();
-
-  const user = res.rows[0];
+  const user = res.results?.[0];
 
   if (!user) {
     return null;
@@ -68,22 +60,15 @@ export const create = async (
   },
   env: Bindings,
 ) => {
-  const client = new Client({
-    connectionString: env.DATABASE_URL,
-  });
-  await client.connect();
-
-  const res = await client.query(
-    `
+  const res = await env.DB.prepare(`
       INSERT INTO users (id, name, email, password_hash)
-      VALUES ($1, $2, $3, $4)
+      VALUES (?, ?, ?, ?)
       RETURNING id, name, email, password_hash
-    `,
-    [id, name, email, passwordHash],
-  );
-  await client.end();
+    `)
+    .bind(id, name, email, passwordHash)
+    .all();
 
-  const user = res.rows[0];
+  const user = res.results?.[0];
 
   if (!user) {
     throw new DatabaseError("Failed to create user", {
