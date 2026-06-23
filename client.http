@@ -1,0 +1,5 @@
+@baseUrl = http://localhost:3333
+@token = X4IaDf+N3zhaVwmb.my5nGNZoChA7uZYmd3dEHSwEHsed9kJQ6VNW02NIql4+KmdzZc3jIVotJDD5D7WkhQGI8eoH3C2cQVYmy+JFjuQXT4TS8u/w4i56Qa7RW9055cYHP//vtZAdUNKwwFJHBZMo9M0kIKWv9hb/nTFlah2rnuG6/kqQVtJPnEmRJojsBRbJRuBxwcgLddU=.BdOu58T03AEfEhZgLBWEoeWLd/BRi4ThzRLrdZ+rQQw=
+
+# health-check
+GET {{baseUrl}}/health
