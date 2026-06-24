@@ -1025,7 +1025,7 @@ R:
 1. ✅ Entender o padrão MVC
 2. ✅ Entender métodos HTTP
 3. ✅ Entender autenticação com tokens
-4. 📝 Criar primeira rota (GET)
+4. ✅ Criar primeira rota (GET)
 5. 📝 Criar rota de login com tokens
 6. 📝 Criar rota de refresh token
 7. 📝 Testar com Postman/Insomnia
@@ -1047,6 +1047,7 @@ R:
 ## Requisitos do Projeto
 
 - [ ] Rota POST `/users` - Criar novo usuário ✅ (Já existe)
+- [ ] Rota GET `/users` - Listar usuários ✅ (Já existe)
 - [ ] Rota POST `/auth/login` - Login de usuário com tokens
 - [ ] Rota POST `/auth/refresh` - Renovar accessToken
 - [ ] Rota POST `/transparency/files/upload` - Upload de arquivo (autenticado)

@@ -5,6 +5,10 @@ export const downloadFileController: ControllerFn = async (c) => {
   await getAppContext(c);
 
   const id = c.req.param("id");
+  if (!id) {
+    return c.json({ message: "ID do arquivo não informado" }, 400);
+  }
+
   const file = await findFileById(id, c.env);
 
   if (!file) {
@@ -17,10 +21,8 @@ export const downloadFileController: ControllerFn = async (c) => {
     return c.json({ message: "Arquivo não encontrado no armazenamento" }, 404);
   }
 
-  return new Response(object.body, {
-    headers: {
-      "Content-Type": file.contentType,
-      "Content-Disposition": `attachment; filename="${file.name}"`,
-    },
+  return c.body(object.body, 200, {
+    "Content-Type": file.contentType,
+    "Content-Disposition": `attachment; filename="${file.name}"`,
   });
 };

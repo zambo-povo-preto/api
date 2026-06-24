@@ -83,3 +83,17 @@ export const create = async (
     passwordHash: user.password_hash,
   };
 };
+
+export const findAllUsers = async (env: Bindings) => {
+  const res = await env.DB.prepare(`
+      SELECT id, name, email
+      FROM users
+    `)
+    .all();
+
+  return res.results?.map((user) => ({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+  })) ?? [];
+};

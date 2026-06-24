@@ -112,7 +112,7 @@ export const findFileById = async (id: string, env: Bindings) => {
     size: file.size,
     categoryId: file.category_id,
     uploadedBy: file.uploaded_by,
-    publishedAt: file.published_at ? file.published_ats: null,
+    publishedAt: file.published_at ? file.published_at : null,
     createdAt: file.created_at,
   } as FileMetadata;
 };

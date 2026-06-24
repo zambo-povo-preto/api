@@ -7,6 +7,10 @@ export const updateCategoryController: ControllerFn = async (c) => {
 
   const { name, description } = inputs;
 
+  if (!id) {
+    return c.json({ message: "ID da categoria não informado" }, 400);
+  }
+
   if (name === undefined && description === undefined) {
     return c.json({ message: "É necessário enviar name ou description" }, 400);
   }
