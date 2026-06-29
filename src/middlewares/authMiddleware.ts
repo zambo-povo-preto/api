@@ -25,7 +25,16 @@ export const authMiddleware: MiddlewareFn = async (c, next) => {
     ? JSON.parse(result.data)
     : result.data;
 
-  c.set("user", payload.user ?? null);
+  if (!payload?.user || typeof payload.user !== "object") {
+    return c.json({ message: "Token inválido ou expirado" }, 401);
+  }
+
+  const user = {
+    id: String(payload.user.id),
+    email: String(payload.user.email),
+  };
+
+  c.set("user", user);
 
   await next();
 };

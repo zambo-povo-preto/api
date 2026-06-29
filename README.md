@@ -882,7 +882,7 @@ POST /auth/refresh ✅
 ### 2. **Portal de Transparência - Arquivo de Upload**
 ```
 POST /transparency/files/upload
-- Autenticação: SIM (usuário logado)
+- Autenticação: SIM (usuário logado) ✅
 - Entrada: arquivo + metadados
 - Saída: confirmação de upload
 ```
@@ -890,7 +890,7 @@ POST /transparency/files/upload
 ### 3. **Portal de Transparência - Listar Arquivos**
 ```
 GET /transparency/files
-- Autenticação: NÃO (público)
+- Autenticação: NÃO (público) ✅
 - Parâmetros: filters, pagination
 - Saída: lista de arquivos
 ```
@@ -898,7 +898,7 @@ GET /transparency/files
 ### 4. **Portal de Transparência - Download de Arquivo**
 ```
 GET /transparency/files/:id/download
-- Autenticação: NÃO (público)
+- Autenticação: NÃO (público) ✅
 - Saída: arquivo para download
 ```
 
@@ -1020,18 +1020,25 @@ R:
 
 ---
 
+## Atualizações Recentes
+
+- ✅ Rota POST /auth/login implementada com validação de credenciais, geração de accessToken e refreshToken.
+- ✅ Rota POST /auth/refresh implementada para renovação do accessToken com base no refreshToken.
+- ✅ Router de autenticação conectado no ponto de entrada da API.
+- ✅ Rotas do portal de transparência implementadas.
+
 ## Próximos Passos
 
 1. ✅ Entender o padrão MVC
 2. ✅ Entender métodos HTTP
 3. ✅ Entender autenticação com tokens
 4. ✅ Criar primeira rota (GET)
-5. 📝 Criar rota de login com tokens
-6. 📝 Criar rota de refresh token
+5. ✅ Criar rota de login com tokens
+6. ✅ Criar rota de refresh token
 7. 📝 Testar com Postman/Insomnia
-8. 📝 Criar middleware de autenticação
-9. 📝 Criar rotas do portal de transparência
-10. 📝 Implementar uploads de arquivo
+8. ✅ Criar middleware de autenticação
+9. ✅ Criar rotas do portal de transparência
+10. ✅ Implementar uploads de arquivo
 
 ---
 
@@ -1048,14 +1055,14 @@ R:
 
 - [ ] Rota POST `/users` - Criar novo usuário ✅ (Já existe)
 - [ ] Rota GET `/users` - Listar usuários ✅ (Já existe)
-- [ ] Rota POST `/auth/login` - Login de usuário com tokens
-- [ ] Rota POST `/auth/refresh` - Renovar accessToken
-- [ ] Rota POST `/transparency/files/upload` - Upload de arquivo (autenticado)
-- [ ] Rota GET `/transparency/files` - Listar arquivos (público)
-- [ ] Rota GET `/transparency/files/:id/download` - Download de arquivo
+- [x] Rota POST `/auth/login` - Login de usuário com tokens
+- [x] Rota POST `/auth/refresh` - Renovar accessToken
+- [x] Rota POST `/transparency/files/upload` - Upload de arquivo (autenticado)
+- [x] Rota GET `/transparency/files` - Listar arquivos (público)
+- [x] Rota GET `/transparency/files/:id/download` - Download de arquivo
 - [ ] Rota PATCH `/users/:id` - Atualizar perfil do usuário
 - [ ] Rota DELETE `/users/:id` - Deletar usuário
-- [ ] Middleware de autenticação - Validar accessToken nas rotas protegidas
+- [x] Middleware de autenticação - Validar accessToken nas rotas protegidas
 
 ---
 

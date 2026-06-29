@@ -3,7 +3,17 @@ import { getDictionary } from "@/dictionaries";
 export const getAppContext = async (c: DomainContext) => {
   const t = getDictionary();
 
-  const inputs = await c.req.json();
+  let inputs = {};
+
+  // Só tenta ler o body se a requisição NÃO for do tipo GET ou HEAD
+  if (c.req.method !== "GET" && c.req.method !== "HEAD") {
+    try {
+      inputs = await c.req.json();
+    } catch (error) {
+      // Se vier um POST/PUT com body vazio ou malformado, 
+      // ele apenas ignora e mantém o inputs como {} em vez de derrubar a API
+    }
+  }
 
   return {
     t,
