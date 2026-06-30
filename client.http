@@ -1,5 +1,52 @@
 @baseUrl = http://localhost:3333
-@token = X4IaDf+N3zhaVwmb.my5nGNZoChA7uZYmd3dEHSwEHsed9kJQ6VNW02NIql4+KmdzZc3jIVotJDD5D7WkhQGI8eoH3C2cQVYmy+JFjuQXT4TS8u/w4i56Qa7RW9055cYHP//vtZAdUNKwwFJHBZMo9M0kIKWv9hb/nTFlah2rnuG6/kqQVtJPnEmRJojsBRbJRuBxwcgLddU=.BdOu58T03AEfEhZgLBWEoeWLd/BRi4ThzRLrdZ+rQQw=
 
-# health-check
-GET {{baseUrl}}/health
+### Criar Usuário
+POST {{baseUrl}}/users
+Content-Type: application/json
+
+{
+  "name": "Admin Teste",
+  "email": "admin@example.com",
+  "password": "Senha@123"
+}
+
+### Criar Categoria
+# @name criarCategoria
+POST {{baseUrl}}/categories
+Content-Type: application/json
+
+{
+  "name": "Documentos Públicos",
+  "description": "Categoria para arquivos do portal de transparência"
+}
+
+### Login
+# @name fazerLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Senha@123"
+}
+
+### Upload de arquivo (autenticado)
+# @name uploadArquivo
+POST {{baseUrl}}/transparency/files/upload
+Content-Type: application/json
+Authorization: Bearer {{fazerLogin.response.body.accessToken}}
+
+{
+  "fileName": "teste.pdf",
+  "description": "Arquivo de teste",
+  "contentType": "application/pdf",
+  "contentBase64": "dGVzdGUgZmlsZQ==",
+  "categoryId": "{{criarCategoria.response.body.category.id}}"
+}
+
+### Listar arquivos (público)
+GET {{baseUrl}}/transparency/files
+
+### Download de arquivo (autenticado)
+GET {{baseUrl}}/transparency/files/{{uploadArquivo.response.body.file.id}}/download
+Authorization: Bearer {{fazerLogin.response.body.accessToken}}

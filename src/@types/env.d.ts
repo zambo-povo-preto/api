@@ -15,10 +15,10 @@ declare global {
   type Variables = {
     dictionary: TranslatorFn;
     daf: IDAF;
-    user: {
+    user?: {
       id: string;
       email: string;
-    };
+    } | null;
     timezone: string;
     timezoneOffset: string;
     locale: string;
