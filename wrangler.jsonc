@@ -38,7 +38,7 @@
       "vars": {
         "DOMAIN": "xn--zambpovopreto-slb.com.br",
         "ENVIRONMENT": "production",
-        "SITE_BASE_URL": "https://xn--zambpovopreto-slb.com.br"
+        "SITE_BASE_URL": "https://site.xn--zambpovopreto-slb.com.br"
       },
       "d1_databases": [
         {
