@@ -10,9 +10,7 @@
   "vars": {
     "DOMAIN": "localhost",
     "ENVIRONMENT": "development",
-    "PANEL_BASE_URL": "http://localhost:3000",
-    "SITE_BASE_URL": "http://localhost:3001",
-    "S3_API_URL": "http://localhost:3333/attachments"
+    "SITE_BASE_URL": "http://localhost:3000"
   },
   "d1_databases": [
     {
@@ -29,10 +27,31 @@
       "remote": false
     }
   ],
-  "dev": {
-    "ip": "localhost",
-    "port": 3333,
-    "local_protocol": "http",
-    "upstream_protocol": "http"
+  "env": {
+    "production": {
+      "name": "api-production",
+      "route": "api.zambôpovopreto.com.br*",
+      "workers_dev": false,
+      "vars": {
+        "DOMAIN": "zambôpovopreto.com.br",
+        "ENVIRONMENT": "production",
+        "SITE_BASE_URL": "https://zambôpovopreto.com.br"
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "zambo-db-production",
+          "database_id": "2dce7a09-2594-48d3-a57c-12abf020f845",
+          "remote": true
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "R2_BUCKET",
+          "bucket_name": "zambo-attachments-production",
+          "remote": true
+        }
+      ]
+    }
   }
 }
