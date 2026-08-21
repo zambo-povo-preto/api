@@ -29,13 +29,16 @@
   ],
   "env": {
     "production": {
-      "name": "api-production",
-      "route": "api.zambôpovopreto.com.br*",
+      "route": {
+        "custom_domain": true,
+        "pattern": "api.xn--zambpovopreto-slb.com.br",
+        "zone_name": "xn--zambpovopreto-slb.com.br"
+      },
       "workers_dev": false,
       "vars": {
-        "DOMAIN": "zambôpovopreto.com.br",
+        "DOMAIN": "xn--zambpovopreto-slb.com.br",
         "ENVIRONMENT": "production",
-        "SITE_BASE_URL": "https://zambôpovopreto.com.br"
+        "SITE_BASE_URL": "https://xn--zambpovopreto-slb.com.br"
       },
       "d1_databases": [
         {
