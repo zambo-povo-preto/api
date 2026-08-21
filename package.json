@@ -3,7 +3,9 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev --local --port=3333",
+    "logs:production": "wrangler tail --env production",
     "deploy": "wrangler deploy --minify",
+    "deploy:production": "wrangler deploy --env production",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
     "lint": "npx @biomejs/biome format --write"
   },
