@@ -37,3 +37,13 @@ CREATE TABLE IF NOT EXISTS transparency_files (
 );
 
 CREATE INDEX IF NOT EXISTS idx_transparency_files_category_id ON transparency_files(category_id);
+
+-- Default document categories
+INSERT INTO categories (id, name, description)
+VALUES 
+  ('cat-prestacao-contas', 'Prestação de Contas', 'Documentos de prestações de contas financeiras e orçamentárias'),
+  ('cat-relatorio-atividades', 'Relatório de Atividades', 'Relatórios periódicos de atividades e impacto de projetos'),
+  ('cat-plano-trabalho', 'Plano de Trabalho', 'Planos de trabalho, diretrizes e metas de projetos'),
+  ('cat-ata-reuniao', 'Ata de Reunião', 'Atas formais de reuniões da diretoria e conselho'),
+  ('cat-edital', 'Edital', 'Editais públicos, chamadas e processos seletivos')
+ON CONFLICT(id) DO NOTHING;
