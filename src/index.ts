@@ -10,12 +10,11 @@ const app = new Hono();
 app.use(
   "*",
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://localhost:3001",
-      "http://127.0.0.1:3000",
-      "http://127.0.0.1:3001",
-    ],
+    origin: (origin, c) => {
+      const allowedOrigins = [c.env.SITE_BASE_URL];
+      const isAllowed = allowedOrigins.includes(origin ?? "");
+      return isAllowed ? origin : null;
+    },
     allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowHeaders: ["Content-Type", "Authorization"],
     exposeHeaders: ["Content-Length", "Content-Disposition"],
