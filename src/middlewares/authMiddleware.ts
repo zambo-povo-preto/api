@@ -21,9 +21,8 @@ export const authMiddleware: MiddlewareFn = async (c, next) => {
     return c.json({ message: "Token inválido ou expirado" }, 401);
   }
 
-  const payload = typeof result.data === "string"
-    ? JSON.parse(result.data)
-    : result.data;
+  const payload =
+    typeof result.data === "string" ? JSON.parse(result.data) : result.data;
 
   if (!payload?.user || typeof payload.user !== "object") {
     return c.json({ message: "Token inválido ou expirado" }, 401);

@@ -5,20 +5,25 @@ export type Category = {
   createdAt: string;
 };
 
-const formatTimestamp = (value: any) => {
+const formatTimestamp = (value: unknown) => {
   if (!value) {
     return "";
   }
 
-  return typeof value === "string" ? value : value.toISOString();
+  return typeof value === "string"
+    ? value
+    : value instanceof Date
+      ? value.toISOString()
+      : String(value);
 };
 
-const mapCategoryRow = (category: any) => ({
-  id: category.id,
-  name: category.name,
-  description: category.description,
-  createdAt: formatTimestamp(category.created_at),
-}) as Category;
+const mapCategoryRow = (category: Record<string, unknown>) =>
+  ({
+    id: String(category.id),
+    name: String(category.name),
+    description: category.description ? String(category.description) : null,
+    createdAt: formatTimestamp(category.created_at),
+  }) as Category;
 
 export const findCategoryById = async (id: string, env: Bindings) => {
   const res = await env.DB.prepare(`
@@ -34,7 +39,7 @@ export const findCategoryById = async (id: string, env: Bindings) => {
     return null;
   }
 
-  return mapCategoryRow(category);
+  return mapCategoryRow(category as Record<string, unknown>);
 };
 
 export const findAllCategories = async (env: Bindings) => {
@@ -42,10 +47,11 @@ export const findAllCategories = async (env: Bindings) => {
       SELECT id, name, description, created_at
       FROM categories
       ORDER BY name
-    `)
-    .all();
+    `).all();
 
-  return (res.results ?? []).map(mapCategoryRow) as Category[];
+  return (res.results ?? []).map((row) =>
+    mapCategoryRow(row as Record<string, unknown>),
+  ) as Category[];
 };
 
 export const createCategory = async (
@@ -62,7 +68,8 @@ export const createCategory = async (
     .all();
 
   const category = res.results?.[0];
-  return mapCategoryRow(category);
+  if (!category) return null;
+  return mapCategoryRow(category as Record<string, unknown>);
 };
 
 export const updateCategory = async (
@@ -71,7 +78,7 @@ export const updateCategory = async (
   env: Bindings,
 ) => {
   const updates: string[] = [];
-  const params: any[] = [];
+  const params: (string | null)[] = [];
 
   if (name !== undefined) {
     updates.push("name = ?");
@@ -103,7 +110,7 @@ export const updateCategory = async (
     return null;
   }
 
-  return mapCategoryRow(category);
+  return mapCategoryRow(category as Record<string, unknown>);
 };
 
 export const deleteCategory = async (id: string, env: Bindings) => {

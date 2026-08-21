@@ -10,7 +10,10 @@ export const createCategoryController: ControllerFn = async (c) => {
     return c.json({ message: "Nome da categoria é obrigatório" }, 400);
   }
 
-  const category = await createCategory({ name, description: description ?? null }, c.env);
+  const category = await createCategory(
+    { name, description: description ?? null },
+    c.env,
+  );
 
   return c.json({ category }, 201);
 };

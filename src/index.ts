@@ -1,10 +1,27 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { authRouter } from "./routers/authRouter";
-import { userRouter } from "./routers/userRouter";
-import { transparencyRouter } from "./routers/transparencyRouter";
 import { categoryRouter } from "./routers/categoryRouter";
+import { transparencyRouter } from "./routers/transparencyRouter";
+import { userRouter } from "./routers/userRouter";
 
 const app = new Hono();
+
+app.use(
+  "*",
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://localhost:3001",
+      "http://127.0.0.1:3000",
+      "http://127.0.0.1:3001",
+    ],
+    allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowHeaders: ["Content-Type", "Authorization"],
+    exposeHeaders: ["Content-Length", "Content-Disposition"],
+    credentials: true,
+  }),
+);
 
 app.get("/health", (c) => c.text("Hello World!"));
 

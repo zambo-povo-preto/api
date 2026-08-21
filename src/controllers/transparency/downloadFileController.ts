@@ -21,8 +21,11 @@ export const downloadFileController: ControllerFn = async (c) => {
     return c.json({ message: "Arquivo não encontrado no armazenamento" }, 404);
   }
 
-  return c.  body(object.body, 200, {
+  const isInline = c.req.query("inline") === "true";
+  const disposition = isInline ? "inline" : "attachment";
+
+  return c.body(object.body, 200, {
     "Content-Type": file.contentType,
-    "Content-Disposition": `attachment; filename="${file.name}"`,
+    "Content-Disposition": `${disposition}; filename="${file.name}"`,
   });
 };

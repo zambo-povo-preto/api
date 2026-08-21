@@ -1,5 +1,8 @@
 import { getAppContext } from "@/helpers/getAppContext";
-import { createAccessToken, verifyAccessTokenSafe } from "serverless-crypto-utils";
+import {
+  createAccessToken,
+  verifyAccessTokenSafe,
+} from "serverless-crypto-utils";
 import * as z from "zod";
 
 export const refreshTokenController: ControllerFn = async (c) => {
@@ -21,9 +24,8 @@ export const refreshTokenController: ControllerFn = async (c) => {
     return c.json({ message: t("error-invalid-refresh-token") }, 401);
   }
 
-  const payload = typeof result.data === "string"
-    ? JSON.parse(result.data)
-    : result.data;
+  const payload =
+    typeof result.data === "string" ? JSON.parse(result.data) : result.data;
 
   const accessToken = await createAccessToken({
     encryptionSecret: c.env.ENCRYPTION_SECRET,

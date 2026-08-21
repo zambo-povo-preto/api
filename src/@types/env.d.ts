@@ -1,6 +1,6 @@
-import type { Context, TypedResponse, Next } from "hono";
 import type { TranslatorFn } from "@/dictionaries";
 import type { IDAF } from "@/services/database";
+import type { Context, Next, TypedResponse } from "hono";
 
 declare global {
   type Env = { Bindings: Bindings; Variables: Variables };
@@ -22,7 +22,7 @@ declare global {
     timezone: string;
     timezoneOffset: string;
     locale: string;
-    inputs: any;
+    inputs: Record<string, unknown>;
   };
 
   type Bindings = {

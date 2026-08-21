@@ -1,5 +1,5 @@
 import { getAppContext } from "@/helpers/getAppContext";
-import { updateCategory, findCategoryById } from "@/models/categoryModel";
+import { findCategoryById, updateCategory } from "@/models/categoryModel";
 
 export const updateCategoryController: ControllerFn = async (c) => {
   const { inputs } = await getAppContext(c);
@@ -21,7 +21,11 @@ export const updateCategoryController: ControllerFn = async (c) => {
     return c.json({ message: "Categoria não encontrada" }, 404);
   }
 
-  const updatedCategory = await updateCategory(id, { name, description }, c.env);
+  const updatedCategory = await updateCategory(
+    id,
+    { name, description },
+    c.env,
+  );
 
   return c.json({ category: updatedCategory }, 200);
 };

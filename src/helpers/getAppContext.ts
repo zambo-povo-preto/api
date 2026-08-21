@@ -10,7 +10,7 @@ export const getAppContext = async (c: DomainContext) => {
     try {
       inputs = await c.req.json();
     } catch (error) {
-      // Se vier um POST/PUT com body vazio ou malformado, 
+      // Se vier um POST/PUT com body vazio ou malformado,
       // ele apenas ignora e mantém o inputs como {} em vez de derrubar a API
     }
   }

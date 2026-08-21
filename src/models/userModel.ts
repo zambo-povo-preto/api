@@ -12,7 +12,7 @@ export const userSchema = (t: TranslatorFn) => {
     password: z
       .string()
       .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/, 
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
         {
           message: t("invalid-password"),
         },
@@ -88,12 +88,13 @@ export const findAllUsers = async (env: Bindings) => {
   const res = await env.DB.prepare(`
       SELECT id, name, email
       FROM users
-    `)
-    .all();
+    `).all();
 
-  return res.results?.map((user) => ({
-    id: user.id,
-    name: user.name,
-    email: user.email,
-  })) ?? [];
+  return (
+    res.results?.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+    })) ?? []
+  );
 };

@@ -1,5 +1,5 @@
-import { registerController } from "@/controllers/users/registerController";
 import { listUsersController } from "@/controllers/users/listUsersController";
+import { registerController } from "@/controllers/users/registerController";
 import { Hono } from "hono";
 
 const app = new Hono();

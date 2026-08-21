@@ -14,7 +14,16 @@ export type FileMetadata = {
 };
 
 export const createFileMetadata = async (
-  { name, description, objectKey, contentType, size, categoryId, uploadedBy }: {
+  {
+    name,
+    description,
+    objectKey,
+    contentType,
+    size,
+    categoryId,
+    uploadedBy,
+    published = true,
+  }: {
     name: string;
     description: string | null;
     objectKey: string;
@@ -22,10 +31,13 @@ export const createFileMetadata = async (
     size: number;
     categoryId: string | null;
     uploadedBy: string;
+    published?: boolean;
   },
   env: Bindings,
 ) => {
   const id = crypto.randomUUID();
+  const publishedAt = published ? new Date().toISOString() : null;
+
   const query = `
       INSERT INTO transparency_files
       (id, name, description, object_key, content_type, size, category_id, uploaded_by, published_at)
@@ -34,13 +46,31 @@ export const createFileMetadata = async (
     `;
 
   const res = await env.DB.prepare(query)
-    .bind(id, name, description, objectKey, contentType, size, categoryId, uploadedBy, null)
+    .bind(
+      id,
+      name,
+      description,
+      objectKey,
+      contentType,
+      size,
+      categoryId,
+      uploadedBy,
+      publishedAt,
+    )
     .all();
 
   const file = res.results?.[0];
   if (!file) {
     throw new DatabaseError("Failed to create file metadata", {
-      values: { name, description, objectKey, contentType, size, categoryId, uploadedBy },
+      values: {
+        name,
+        description,
+        objectKey,
+        contentType,
+        size,
+        categoryId,
+        uploadedBy,
+      },
     });
   }
 
@@ -53,12 +83,15 @@ export const createFileMetadata = async (
     size: file.size,
     categoryId: file.category_id,
     uploadedBy: file.uploaded_by,
-    publishedAt: file.published_at ? file.published_at : null,
-    createdAt: file.created_at,
+    publishedAt: file.published_at ? String(file.published_at) : null,
+    createdAt: String(file.created_at),
   } as FileMetadata;
 };
 
-export const findAllFiles = async (env: Bindings, categoryId?: string | null) => {
+export const findAllFiles = async (
+  env: Bindings,
+  categoryId?: string | null,
+) => {
   const query = categoryId
     ? `
       SELECT id, name, description, object_key, content_type, size, category_id, created_at, uploaded_by, published_at
@@ -76,16 +109,16 @@ export const findAllFiles = async (env: Bindings, categoryId?: string | null) =>
   const res = categoryId ? await stmt.bind(categoryId).all() : await stmt.all();
 
   return (res.results ?? []).map((file) => ({
-    id: file.id,
-    name: file.name,
-    description: file.description,
-    objectKey: file.object_key,
-    contentType: file.content_type,
-    size: file.size,
-    categoryId: file.category_id,
-    uploadedBy: file.uploaded_by,
-    publishedAt: file.published_at ? file.published_at : null,
-    createdAt: file.created_at,
+    id: String(file.id),
+    name: String(file.name),
+    description: file.description ? String(file.description) : null,
+    objectKey: String(file.object_key),
+    contentType: String(file.content_type),
+    size: Number(file.size),
+    categoryId: file.category_id ? String(file.category_id) : null,
+    uploadedBy: String(file.uploaded_by),
+    publishedAt: file.published_at ? String(file.published_at) : null,
+    createdAt: String(file.created_at),
   })) as FileMetadata[];
 };
 
@@ -104,15 +137,49 @@ export const findFileById = async (id: string, env: Bindings) => {
   }
 
   return {
-    id: file.id,
-    name: file.name,
-    description: file.description,
-    objectKey: file.object_key,
-    contentType: file.content_type,
-    size: file.size,
-    categoryId: file.category_id,
-    uploadedBy: file.uploaded_by,
-    publishedAt: file.published_at ? file.published_at : null,
-    createdAt: file.created_at,
+    id: String(file.id),
+    name: String(file.name),
+    description: file.description ? String(file.description) : null,
+    objectKey: String(file.object_key),
+    contentType: String(file.content_type),
+    size: Number(file.size),
+    categoryId: file.category_id ? String(file.category_id) : null,
+    uploadedBy: String(file.uploaded_by),
+    publishedAt: file.published_at ? String(file.published_at) : null,
+    createdAt: String(file.created_at),
   } as FileMetadata;
+};
+
+export const deleteFileById = async (id: string, env: Bindings) => {
+  const file = await findFileById(id, env);
+  if (!file) return null;
+
+  await env.DB.prepare(`
+      DELETE FROM transparency_files
+      WHERE id = ?
+    `)
+    .bind(id)
+    .run();
+
+  return file;
+};
+
+export const toggleFilePublishedStatus = async (id: string, env: Bindings) => {
+  const file = await findFileById(id, env);
+  if (!file) return null;
+
+  const newPublishedAt = file.publishedAt ? null : new Date().toISOString();
+
+  await env.DB.prepare(`
+      UPDATE transparency_files
+      SET published_at = ?
+      WHERE id = ?
+    `)
+    .bind(newPublishedAt, id)
+    .run();
+
+  return {
+    ...file,
+    publishedAt: newPublishedAt,
+  };
 };

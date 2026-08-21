@@ -1,9 +1,9 @@
-import { Hono } from "hono";
-import { listCategoriesController } from "@/controllers/categories/listCategoriesController";
-import { getCategoryController } from "@/controllers/categories/getCategoryController";
 import { createCategoryController } from "@/controllers/categories/createCategoryController";
-import { updateCategoryController } from "@/controllers/categories/updateCategoryController";
 import { deleteCategoryController } from "@/controllers/categories/deleteCategoryController";
+import { getCategoryController } from "@/controllers/categories/getCategoryController";
+import { listCategoriesController } from "@/controllers/categories/listCategoriesController";
+import { updateCategoryController } from "@/controllers/categories/updateCategoryController";
+import { Hono } from "hono";
 
 const app = new Hono();
 
