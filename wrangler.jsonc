@@ -17,6 +17,7 @@
       "binding": "DB",
       "database_name": "zambo-db-dev",
       "database_id": "50af40d7-b758-4afc-8676-97aebdbb27fa",
+      "migrations_dir": "database/migrations",
       "remote": false
     }
   ],
@@ -45,6 +46,7 @@
           "binding": "DB",
           "database_name": "zambo-db-production",
           "database_id": "2dce7a09-2594-48d3-a57c-12abf020f845",
+          "migrations_dir": "database/migrations",
           "remote": true
         }
       ],

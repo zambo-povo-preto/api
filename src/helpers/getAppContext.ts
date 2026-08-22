@@ -3,7 +3,8 @@ import { getDictionary } from "@/dictionaries";
 export const getAppContext = async (c: DomainContext) => {
   const t = getDictionary();
 
-  let inputs = {};
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  let inputs: any = {};
 
   // Só tenta ler o body se a requisição NÃO for do tipo GET ou HEAD
   if (c.req.method !== "GET" && c.req.method !== "HEAD") {

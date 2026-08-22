@@ -164,22 +164,53 @@ export const deleteFileById = async (id: string, env: Bindings) => {
   return file;
 };
 
+export const updateFileMetadata = async (
+  id: string,
+  {
+    name,
+    description,
+    categoryId,
+    published,
+  }: {
+    name?: string;
+    description?: string | null;
+    categoryId?: string | null;
+    published?: boolean;
+  },
+  env: Bindings,
+) => {
+  const file = await findFileById(id, env);
+  if (!file) return null;
+
+  const newName = name !== undefined ? name : file.name;
+  const newDescription =
+    description !== undefined ? description : file.description;
+  const newCategoryId =
+    categoryId !== undefined ? categoryId : file.categoryId;
+
+  let newPublishedAt = file.publishedAt;
+  if (published !== undefined) {
+    newPublishedAt = published
+      ? file.publishedAt || new Date().toISOString()
+      : null;
+  }
+
+  await env.DB.prepare(`
+      UPDATE transparency_files
+      SET name = ?, description = ?, category_id = ?, published_at = ?
+      WHERE id = ?
+    `)
+    .bind(newName, newDescription, newCategoryId, newPublishedAt, id)
+    .run();
+
+  return findFileById(id, env);
+};
+
 export const toggleFilePublishedStatus = async (id: string, env: Bindings) => {
   const file = await findFileById(id, env);
   if (!file) return null;
 
-  const newPublishedAt = file.publishedAt ? null : new Date().toISOString();
-
-  await env.DB.prepare(`
-      UPDATE transparency_files
-      SET published_at = ?
-      WHERE id = ?
-    `)
-    .bind(newPublishedAt, id)
-    .run();
-
-  return {
-    ...file,
-    publishedAt: newPublishedAt,
-  };
+  return updateFileMetadata(id, { published: !file.publishedAt }, env);
 };
+
+
