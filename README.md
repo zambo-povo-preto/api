@@ -12,6 +12,7 @@ O projeto foi desenvolvido em TypeScript com [Hono](https://hono.dev/) e executa
 - [Estrutura do projeto](#estrutura-do-projeto)
 - [Esquema do banco de dados](#esquema-do-banco-de-dados)
 - [Rotas da API](#rotas-da-api)
+- [Conformidade LGPD e Portal da Transparência](./LGPD_E_ARQUITETURA_TRANSPARENCIA.md)
 - [Exemplos de codigo](#exemplos-de-codigo)
 - [Licenca](#licenca)
 

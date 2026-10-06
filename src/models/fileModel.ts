@@ -5,6 +5,7 @@ export type FileMetadata = {
   name: string;
   description: string | null;
   objectKey: string;
+  publicObjectKey: string | null;
   contentType: string;
   size: number;
   categoryId: string | null;
@@ -13,11 +14,28 @@ export type FileMetadata = {
   createdAt: string;
 };
 
+// Helper mapper for database record to FileMetadata
+// biome-ignore lint/suspicious/noExplicitAny: D1 query row object
+const mapFileRecord = (file: Record<string, any>): FileMetadata => ({
+  id: String(file.id),
+  name: String(file.name),
+  description: file.description ? String(file.description) : null,
+  objectKey: String(file.object_key),
+  publicObjectKey: file.public_object_key ? String(file.public_object_key) : null,
+  contentType: String(file.content_type),
+  size: Number(file.size),
+  categoryId: file.category_id ? String(file.category_id) : null,
+  uploadedBy: String(file.uploaded_by),
+  publishedAt: file.published_at ? String(file.published_at) : null,
+  createdAt: String(file.created_at),
+});
+
 export const createFileMetadata = async (
   {
     name,
     description,
     objectKey,
+    publicObjectKey,
     contentType,
     size,
     categoryId,
@@ -27,6 +45,7 @@ export const createFileMetadata = async (
     name: string;
     description: string | null;
     objectKey: string;
+    publicObjectKey?: string | null;
     contentType: string;
     size: number;
     categoryId: string | null;
@@ -40,9 +59,9 @@ export const createFileMetadata = async (
 
   const query = `
       INSERT INTO transparency_files
-      (id, name, description, object_key, content_type, size, category_id, uploaded_by, published_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-      RETURNING id, name, description, object_key, content_type, size, category_id, uploaded_by, published_at, created_at
+      (id, name, description, object_key, public_object_key, content_type, size, category_id, uploaded_by, published_at)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      RETURNING id, name, description, object_key, public_object_key, content_type, size, category_id, uploaded_by, published_at, created_at
     `;
 
   const res = await env.DB.prepare(query)
@@ -51,6 +70,7 @@ export const createFileMetadata = async (
       name,
       description,
       objectKey,
+      publicObjectKey ?? null,
       contentType,
       size,
       categoryId,
@@ -74,57 +94,50 @@ export const createFileMetadata = async (
     });
   }
 
-  return {
-    id: file.id,
-    name: file.name,
-    description: file.description,
-    objectKey: file.object_key,
-    contentType: file.content_type,
-    size: file.size,
-    categoryId: file.category_id,
-    uploadedBy: file.uploaded_by,
-    publishedAt: file.published_at ? String(file.published_at) : null,
-    createdAt: String(file.created_at),
-  } as FileMetadata;
+  return mapFileRecord(file);
 };
 
 export const findAllFiles = async (
   env: Bindings,
-  categoryId?: string | null,
+  options?: {
+    categoryId?: string | null;
+    onlyPublished?: boolean;
+  },
 ) => {
-  const query = categoryId
-    ? `
-      SELECT id, name, description, object_key, content_type, size, category_id, created_at, uploaded_by, published_at
-      FROM transparency_files
-      WHERE category_id = ?
-      ORDER BY created_at DESC
-    `
-    : `
-      SELECT id, name, description, object_key, content_type, size, category_id, created_at, uploaded_by, published_at
-      FROM transparency_files
-      ORDER BY created_at DESC
-    `;
+  const { categoryId, onlyPublished } = options || {};
+
+  let query = `
+    SELECT id, name, description, object_key, public_object_key, content_type, size, category_id, created_at, uploaded_by, published_at
+    FROM transparency_files
+  `;
+
+  const conditions: string[] = [];
+  const bindings: unknown[] = [];
+
+  if (categoryId) {
+    conditions.push("category_id = ?");
+    bindings.push(categoryId);
+  }
+
+  if (onlyPublished) {
+    conditions.push("published_at IS NOT NULL");
+  }
+
+  if (conditions.length > 0) {
+    query += ` WHERE ${conditions.join(" AND ")}`;
+  }
+
+  query += ` ORDER BY created_at DESC`;
 
   const stmt = env.DB.prepare(query);
-  const res = categoryId ? await stmt.bind(categoryId).all() : await stmt.all();
+  const res = bindings.length > 0 ? await stmt.bind(...bindings).all() : await stmt.all();
 
-  return (res.results ?? []).map((file) => ({
-    id: String(file.id),
-    name: String(file.name),
-    description: file.description ? String(file.description) : null,
-    objectKey: String(file.object_key),
-    contentType: String(file.content_type),
-    size: Number(file.size),
-    categoryId: file.category_id ? String(file.category_id) : null,
-    uploadedBy: String(file.uploaded_by),
-    publishedAt: file.published_at ? String(file.published_at) : null,
-    createdAt: String(file.created_at),
-  })) as FileMetadata[];
+  return (res.results ?? []).map(mapFileRecord);
 };
 
 export const findFileById = async (id: string, env: Bindings) => {
   const res = await env.DB.prepare(`
-      SELECT id, name, description, object_key, content_type, size, category_id, created_at, uploaded_by, published_at
+      SELECT id, name, description, object_key, public_object_key, content_type, size, category_id, created_at, uploaded_by, published_at
       FROM transparency_files
       WHERE id = ?
     `)
@@ -136,18 +149,7 @@ export const findFileById = async (id: string, env: Bindings) => {
     return null;
   }
 
-  return {
-    id: String(file.id),
-    name: String(file.name),
-    description: file.description ? String(file.description) : null,
-    objectKey: String(file.object_key),
-    contentType: String(file.content_type),
-    size: Number(file.size),
-    categoryId: file.category_id ? String(file.category_id) : null,
-    uploadedBy: String(file.uploaded_by),
-    publishedAt: file.published_at ? String(file.published_at) : null,
-    createdAt: String(file.created_at),
-  } as FileMetadata;
+  return mapFileRecord(file);
 };
 
 export const deleteFileById = async (id: string, env: Bindings) => {
@@ -171,11 +173,13 @@ export const updateFileMetadata = async (
     description,
     categoryId,
     published,
+    publicObjectKey,
   }: {
     name?: string;
     description?: string | null;
     categoryId?: string | null;
     published?: boolean;
+    publicObjectKey?: string | null;
   },
   env: Bindings,
 ) => {
@@ -187,6 +191,8 @@ export const updateFileMetadata = async (
     description !== undefined ? description : file.description;
   const newCategoryId =
     categoryId !== undefined ? categoryId : file.categoryId;
+  const newPublicObjectKey =
+    publicObjectKey !== undefined ? publicObjectKey : file.publicObjectKey;
 
   let newPublishedAt = file.publishedAt;
   if (published !== undefined) {
@@ -197,10 +203,10 @@ export const updateFileMetadata = async (
 
   await env.DB.prepare(`
       UPDATE transparency_files
-      SET name = ?, description = ?, category_id = ?, published_at = ?
+      SET name = ?, description = ?, category_id = ?, published_at = ?, public_object_key = ?
       WHERE id = ?
     `)
-    .bind(newName, newDescription, newCategoryId, newPublishedAt, id)
+    .bind(newName, newDescription, newCategoryId, newPublishedAt, newPublicObjectKey, id)
     .run();
 
   return findFileById(id, env);
@@ -212,5 +218,3 @@ export const toggleFilePublishedStatus = async (id: string, env: Bindings) => {
 
   return updateFileMetadata(id, { published: !file.publishedAt }, env);
 };
-
-
