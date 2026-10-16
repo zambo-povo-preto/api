@@ -8,9 +8,9 @@
   "workers_dev": true,
   "preview_urls": false,
   "vars": {
-    "DOMAIN": "localhost",
+    "DOMAIN": "zambodeveloper.workers.dev",
     "ENVIRONMENT": "development",
-    "SITE_BASE_URL": "http://localhost:3000"
+    "SITE_BASE_URL": "https://site-dev.zambodeveloper.workers.dev"
   },
   "d1_databases": [
     {
