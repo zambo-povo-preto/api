@@ -7,6 +7,9 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "preview_urls": false,
+  "observability": {
+    "enabled": false
+  },
   "vars": {
     "DOMAIN": "zambodeveloper.workers.dev",
     "ENVIRONMENT": "development",
@@ -36,6 +39,9 @@
         "zone_name": "xn--zambpovopreto-slb.com.br"
       },
       "workers_dev": false,
+      "observability": {
+        "enabled": false
+      },
       "vars": {
         "DOMAIN": "xn--zambpovopreto-slb.com.br",
         "ENVIRONMENT": "production",
