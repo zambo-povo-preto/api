@@ -7,10 +7,13 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
   "preview_urls": false,
+  "observability": {
+    "enabled": false
+  },
   "vars": {
-    "DOMAIN": "localhost",
+    "DOMAIN": "zambodeveloper.workers.dev",
     "ENVIRONMENT": "development",
-    "SITE_BASE_URL": "http://localhost:3000"
+    "SITE_BASE_URL": "https://site-dev.zambodeveloper.workers.dev"
   },
   "d1_databases": [
     {
@@ -36,6 +39,9 @@
         "zone_name": "xn--zambpovopreto-slb.com.br"
       },
       "workers_dev": false,
+      "observability": {
+        "enabled": false
+      },
       "vars": {
         "DOMAIN": "xn--zambpovopreto-slb.com.br",
         "ENVIRONMENT": "production",
