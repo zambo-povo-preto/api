@@ -1,5 +1,8 @@
 @baseUrl = http://localhost:3333
 
+### Health
+GET {{baseUrl}}/health
+
 ### Criar Usuário
 POST {{baseUrl}}/users
 Content-Type: application/json
