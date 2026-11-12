@@ -4,6 +4,7 @@ import { authRouter } from "./routers/authRouter";
 import { categoryRouter } from "./routers/categoryRouter";
 import { transparencyRouter } from "./routers/transparencyRouter";
 import { userRouter } from "./routers/userRouter";
+import { collaboratorRouter } from "./routers/collaboratorRouter";
 
 const app = new Hono();
 
@@ -28,5 +29,6 @@ app.route("/auth", authRouter);
 app.route("/users", userRouter);
 app.route("/transparency", transparencyRouter);
 app.route("/categories", categoryRouter);
+app.route("collaborators", collaboratorRouter);
 
 export default app;

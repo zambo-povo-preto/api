@@ -50,3 +50,17 @@ GET {{baseUrl}}/transparency/files
 ### Download de arquivo (autenticado)
 GET {{baseUrl}}/transparency/files/{{uploadArquivo.response.body.file.id}}/download
 Authorization: Bearer {{fazerLogin.response.body.accessToken}}
+
+
+
+### Criar Colaborador
+POST http://localhost:3333/collaborators
+Content-Type: application/json
+
+{
+  "name": "Danilo Alves",
+  "role": "Desenvolvedor Web & Voluntário Tech",
+  "description": "Responsável pelo suporte e modernização das plataformas digitais da Zambô.",
+  "socialLabel": "@daniloalves",
+  "socialLink": "https://github.com/daniloalves"
+}
