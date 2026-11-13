@@ -29,6 +29,6 @@ app.route("/auth", authRouter);
 app.route("/users", userRouter);
 app.route("/transparency", transparencyRouter);
 app.route("/categories", categoryRouter);
-app.route("collaborators", collaboratorRouter);
+app.route("/collaborators", collaboratorRouter);
 
 export default app;

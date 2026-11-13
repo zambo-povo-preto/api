@@ -57,10 +57,36 @@ Authorization: Bearer {{fazerLogin.response.body.accessToken}}
 POST {{baseUrl}}/collaborators
 Content-Type: application/json
 
+
 {
-  "name": "Danilo Alves",
-  "role": "Desenvolvedor Web & Voluntário Tech",
-  "description": "Responsável pelo suporte e modernização das plataformas digitais da Zambô.",
-  "socialLabel": "@daniloalves",
-  "socialLink": "https://github.com/daniloalves"
+  "name": "Carlos Almeida",
+  "role": "Desenvolvedor Backend",
+  "description": "Especialista em criar rotas com Hono e Cloudflare D1.",
+  "socialLabel": "@carlos.dev",
+  "socialLink": "https://linkedin.com/in/carlosalmeida"
 }
+
+### 2. READ - Listar para confirmar a criação e pegar o ID
+
+GET {{baseUrl}}/collaborators
+
+### 3. UPDATE - Atualizar os dados do Carlos
+# -> O Carlos foi promovido e tirou férias (active: false). 
+# -> Substitui 'COLE_O_ID_AQUI' pelo ID que copiaste no passo 2!
+### 3. UPDATE - Atualizar os dados do Carlos
+PATCH {{baseUrl}}/collaborators/c1d59a64-699c-4e58-860b-d89de3f631f7
+Content-Type: application/json
+
+{
+  "role": "Arquiteto de Software",
+  "description": "Responsável pela infraestrutura do Zambô. (De Férias)",
+  "active": false
+}
+
+### 5. DELETE - Carlos saiu do projeto, apagar registro
+# -> Substitui 'COLE_O_ID_AQUI' pelo mesmo ID
+DELETE http://localhost:3333/collaborators/c1d59a64-699c-4e58-860b-d89de3f631f7
+
+### 6. READ (Verificação Final)
+# -> Lista tudo e certifica-te de que o Carlos desapareceu definitivamente
+GET http://localhost:3333/collaborators
