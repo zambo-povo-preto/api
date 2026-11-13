@@ -1,25 +1,24 @@
-import { PrismaClient } from '../../generated/prisma/client';
-
 export const createCollaborator = async (
-
-    prisma: PrismaClient,
     data: {
         name: string;
         role: string;
-        description?: string;
-        photoUrl?: string;
-        socialLink?: string;
-        socialLabel?: string;
-
-    }
+        description?: string | null;
+        photoUrl?: string | null;
+        socialLink?: string | null;
+        socialLabel?: string | null;
+    },
+    env: Bindings,
 ) => {
-    return await prisma.collaborator.create({
-        data,
-    });
-};
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
 
-export const listCollaborators = async (prisma: PrismaClient) => {
-    return await prisma.collaborator.findMany({
-        orderBy: { createdAt: 'desc' }
-    })
-}
+    const res = await env.DB.prepare(`
+      INSERT INTO collaborators (id, name, role, description, photoUrl, socialLink, socialLabel, active, createdAt, updatedAt)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      RETURNING *
+    `)
+        .bind(id, data.name, data.role, data.description ?? null, data.photoUrl ?? null, data.socialLink ?? null, data.socialLabel ?? null, 1, now, now)
+        .all();
+
+    return res.results?.[0] || null;
+};

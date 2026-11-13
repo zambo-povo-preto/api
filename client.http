@@ -54,7 +54,7 @@ Authorization: Bearer {{fazerLogin.response.body.accessToken}}
 
 
 ### Criar Colaborador
-POST http://localhost:3333/collaborators
+POST {{baseUrl}}/collaborators
 Content-Type: application/json
 
 {

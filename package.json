@@ -10,6 +10,7 @@
     "lint": "npx @biomejs/biome format --write"
   },
   "dependencies": {
+    "@prisma/adapter-d1": "^7.10.1",
     "@prisma/client": "^7.8.0",
     "hono": "^4.12.9",
     "serverless-crypto-utils": "^2.0.0",
