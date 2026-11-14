@@ -12,7 +12,11 @@ app.use(
   "*",
   cors({
     origin: (origin, c) => {
-      const allowedOrigins = [c.env.SITE_BASE_URL];
+      const allowedOrigins = [c.env.SITE_BASE_URL,
+        "http://localhost:3000",
+        "http://127.0.0.1:3000"
+
+      ];
       const isAllowed = allowedOrigins.includes(origin ?? "");
       return isAllowed ? origin : null;
     },
